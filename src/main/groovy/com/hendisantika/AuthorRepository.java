@@ -39,4 +39,11 @@ public class AuthorRepository {
 
         this.jdbcTemplate.update(sql, author.id().id().toString(), author.name());
     }
+
+    public void delete(AuthorId authorId) {
+        if (authorId == null) {
+            return;
+        }
+        this.jdbcTemplate.update("DELETE FROM authors WHERE id = ?", authorId.id());
+    }
 }
