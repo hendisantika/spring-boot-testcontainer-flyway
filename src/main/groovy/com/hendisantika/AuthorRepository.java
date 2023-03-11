@@ -31,4 +31,12 @@ public class AuthorRepository {
         return this.jdbcTemplate.query("SELECT id, name FROM authors ORDER BY name",
                 (rs, rowNum) -> new Author(AuthorId.from(rs.getString("id")), rs.getString("name")));
     }
+
+    public void add(Author author) {
+        var sql = """
+                INSERT INTO authors(id, name) VALUES (?::uuid, ?);
+                """;
+
+        this.jdbcTemplate.update(sql, author.id().id().toString(), author.name());
+    }
 }
