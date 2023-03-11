@@ -123,3 +123,15 @@ task stopDatabaseContainer(type: DockerStopContainer) {
 
     targetContainerId startDatabaseContainer.getContainerId()
 }
+
+task runFlywayMigrations(type: FlywayMigrateTask) {
+    dependsOn startDatabaseContainer
+
+    onlyIf { startDatabaseContainer.didWork }
+
+    driver = 'org.postgresql.Driver'
+    url = 'jdbc:postgresql://localhost:5432/testC'
+    user = 'flyway'
+    password = 'flyway'
+    connectRetries = 5
+}
