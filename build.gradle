@@ -115,3 +115,11 @@ task startDatabaseContainer(type: DockerStartContainer) {
 
     targetContainerId createDatabaseContainer.getContainerId()
 }
+
+task stopDatabaseContainer(type: DockerStopContainer) {
+    dependsOn startDatabaseContainer
+
+    onlyIf { startDatabaseContainer.didWork }
+
+    targetContainerId startDatabaseContainer.getContainerId()
+}
