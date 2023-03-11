@@ -135,3 +135,13 @@ task runFlywayMigrations(type: FlywayMigrateTask) {
     password = 'flyway'
     connectRetries = 5
 }
+
+task dumpDatabase(type: DockerExecContainer) {
+    dependsOn runFlywayMigrations
+
+    onlyIf { runFlywayMigrations.didWork }
+
+    targetContainerId startDatabaseContainer.getContainerId()
+    withCommand(['pg_dump', '--clean', '--if-exists', '--inserts', '--disable-dollar-quoting',
+                 '--no-owner', '-d', 'squash', '-U', 'flyway', '--file', '/tmp/db.sql'])
+}
