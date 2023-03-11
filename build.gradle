@@ -145,3 +145,20 @@ task dumpDatabase(type: DockerExecContainer) {
     withCommand(['pg_dump', '--clean', '--if-exists', '--inserts', '--disable-dollar-quoting',
                  '--no-owner', '-d', 'squash', '-U', 'flyway', '--file', '/tmp/db.sql'])
 }
+
+task copyDatabaseDumpToHost(type: DockerCopyFileFromContainer) {
+    dependsOn dumpDatabase
+    finalizedBy stopDatabaseContainer
+
+    onlyIf { dumpDatabase.didWork }
+    outputs.file(dumpPath)
+
+    targetContainerId startDatabaseContainer.getContainerId()
+    remotePath = '/tmp/db.sql'
+    hostPath = dumpPath.toString()
+}
+
+// Ensure that a database dump is present before tests are run.
+tasks.withType(ProcessResources).configureEach {
+    dependsOn copyDatabaseDumpToHost
+}
