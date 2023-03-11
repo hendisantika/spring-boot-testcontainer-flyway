@@ -107,3 +107,11 @@ task createDatabaseContainer(type: DockerCreateContainer) {
     withEnvVar('POSTGRES_PASSWORD', 'flyway')
     withEnvVar('POSTGRES_DB', 'testC')
 }
+
+task startDatabaseContainer(type: DockerStartContainer) {
+    dependsOn createDatabaseContainer
+
+    onlyIf { createDatabaseContainer.didWork }
+
+    targetContainerId createDatabaseContainer.getContainerId()
+}
