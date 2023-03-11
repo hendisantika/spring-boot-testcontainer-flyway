@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -24,5 +25,10 @@ public class AuthorRepository {
 
     public AuthorRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = Objects.requireNonNull(jdbcTemplate);
+    }
+
+    public List<Author> findAll() {
+        return this.jdbcTemplate.query("SELECT id, name FROM authors ORDER BY name",
+                (rs, rowNum) -> new Author(AuthorId.from(rs.getString("id")), rs.getString("name")));
     }
 }
