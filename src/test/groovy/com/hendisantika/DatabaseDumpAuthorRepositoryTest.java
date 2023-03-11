@@ -1,5 +1,6 @@
 package com.hendisantika;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
@@ -7,6 +8,8 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,4 +37,14 @@ public class DatabaseDumpAuthorRepositoryTest extends AbstractPostgresJupiterTes
 
     @Autowired
     AuthorRepository authorRepository;
+
+
+    @Test
+    void findAll_returnsAllAuthors() {
+        var authors = this.authorRepository.findAll();
+
+        assertThat(authors)
+                .extracting(Author::name)
+                .containsExactly("Bert Bates", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
+    }
 }
