@@ -93,3 +93,17 @@ task pullDatabaseImage(type: DockerPullImage) {
                 StandardOpenOption.TRUNCATE_EXISTING)
     }
 }
+
+task createDatabaseContainer(type: DockerCreateContainer) {
+    dependsOn pullDatabaseImage
+
+    // onlyIf hackery is needed (as of v9.0.0) to make all Docker plug-in tasks play well with incremental builds.
+    onlyIf { pullDatabaseImage.didWork }
+
+    targetImageId pullDatabaseImage.getImage()
+    hostConfig.portBindings = ['5432:5432']
+    hostConfig.autoRemove = true
+    withEnvVar('POSTGRES_USER', 'flyway')
+    withEnvVar('POSTGRES_PASSWORD', 'flyway')
+    withEnvVar('POSTGRES_DB', 'testC')
+}
