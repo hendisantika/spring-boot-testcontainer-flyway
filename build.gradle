@@ -10,7 +10,6 @@ plugins {
 
 group = 'com.hendisantika'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
 
 configurations {
     compileOnly {
@@ -28,7 +27,7 @@ ext {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(19)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -52,6 +51,45 @@ dependencyManagement {
     }
 }
 
-tasks.named('test') {
+tasks.withType(Test).configureEach {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    // Use at most 80% of the available CPU cores (but no less than 1) for running tests. The remaining cores can then
+    // be used by Docker and other processes.
+    maxParallelForks = Math.floor(Runtime.runtime.availableProcessors() * 0.8) ?: 1
+}
+
+// The custom Gradle tasks apply all Flyway migrations on an empty database. Then, they create a database dump that can
+// be used to re-initialize the test database before every test. If you do not need that functionality, remove all
+// remaining lines.
+
+import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
+
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption
+
+// Path where the generated database dump will be saved. Committing it to source control is another option.
+def dumpPath = project.buildDir.toPath().resolve('resources/test/db.sql')
+
+task pullDatabaseImage(type: DockerPullImage) {
+    def stateFile = project.buildDir.toPath().resolve("tmp/squash.txt")
+
+    // Declaring inputs and outputs make this task participate in incremental builds and build caching. By declaring the
+    // Flyway migration scripts as inputs the task will only run if something has changed that potentially affects the
+    // generated database dump.
+    inputs.files(fileTree('src/main/resources/db/migration'))
+            .withPropertyName('migrations')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(stateFile)
+            .withPropertyName('stateFile')
+
+    image = 'docker.io/library/postgres:15.2'
+
+    doLast {
+        Files.writeString(stateFile, getImage().get(), StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING)
+    }
 }
