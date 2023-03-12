@@ -84,6 +84,15 @@ public class FlywayMigrationStrategyAuthorRepositoryTest extends AbstractPostgre
                 .containsExactly("Bert Bates", "Kathy Sierra", "Trisha Gee");
     }
 
+    @Test
+    void delete_hasNoEffectWhenAuthorIsUnknown() {
+        this.authorRepository.delete(AuthorId.from("06f4cec2-d26d-43ac-9cd5-351825bf2af9"));
+
+        assertThat(this.authorRepository.findAll())
+                .extracting(Author::name)
+                .containsExactly("Bert Bates", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
+    }
+
     @SpringBootApplication
     public static class TestConfiguration {
         @Bean
