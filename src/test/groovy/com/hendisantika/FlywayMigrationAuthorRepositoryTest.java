@@ -12,8 +12,11 @@ package com.hendisantika;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -42,4 +45,15 @@ public class FlywayMigrationAuthorRepositoryTest extends AbstractPostgresJupiter
 
     @Autowired
     AuthorRepository authorRepository;
+
+    @SpringBootApplication
+    public static class TestConfiguration {
+        @Bean
+        public FlywayMigrationStrategy flywayMigrationStrategy() {
+            return flyway -> {
+                // Do nothing to disable the Flyway migration action on startup without having to disable the Flyway
+                // autoconfiguration which is what spring.flyway.enabled=false would do.
+            };
+        }
+    }
 }
