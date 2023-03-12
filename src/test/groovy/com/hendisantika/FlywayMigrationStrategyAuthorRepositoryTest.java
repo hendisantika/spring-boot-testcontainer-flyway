@@ -55,6 +55,17 @@ public class FlywayMigrationStrategyAuthorRepositoryTest extends AbstractPostgre
                 .containsExactly("Bert Bates", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
     }
 
+    @Test
+    void add_insertsAuthor() {
+        var author = new Author(AuthorId.from("82f4870d-f2e5-4a9f-a2b2-b297f66733a0"), "Brian Goetz");
+
+        this.authorRepository.add(author);
+
+        assertThat(this.authorRepository.findAll())
+                .extracting(Author::name)
+                .containsExactly("Bert Bates", "Brian Goetz", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
+    }
+
     @SpringBootApplication
     public static class TestConfiguration {
         @Bean
