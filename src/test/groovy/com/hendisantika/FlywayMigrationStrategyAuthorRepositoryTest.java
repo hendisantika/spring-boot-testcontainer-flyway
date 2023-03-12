@@ -12,9 +12,11 @@ package com.hendisantika;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,4 +42,15 @@ public class FlywayMigrationStrategyAuthorRepositoryTest extends AbstractPostgre
 
     @Autowired
     AuthorRepository authorRepository;
+
+    @SpringBootApplication
+    public static class TestConfiguration {
+        @Bean
+        public FlywayMigrationStrategy flywayMigrationStrategy() {
+            return flyway -> {
+                flyway.clean();
+                flyway.migrate();
+            };
+        }
+    }
 }
