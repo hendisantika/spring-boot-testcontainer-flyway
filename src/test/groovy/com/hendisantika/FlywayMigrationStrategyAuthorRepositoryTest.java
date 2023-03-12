@@ -11,6 +11,7 @@ package com.hendisantika;
  * To change this template use File | Settings | File Templates.
  */
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration test that resets the database after each test with a custom {@link FlywayMigrationStrategy}. Because the
@@ -42,6 +45,15 @@ public class FlywayMigrationStrategyAuthorRepositoryTest extends AbstractPostgre
 
     @Autowired
     AuthorRepository authorRepository;
+
+    @Test
+    void findAll_returnsAllAuthors() {
+        var authors = this.authorRepository.findAll();
+
+        assertThat(authors)
+                .extracting(Author::name)
+                .containsExactly("Bert Bates", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
+    }
 
     @SpringBootApplication
     public static class TestConfiguration {
