@@ -69,6 +69,14 @@ public class FlywayMigrationAuthorRepositoryTest extends AbstractPostgresJupiter
                 .containsExactly("Bert Bates", "Brian Goetz", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
     }
 
+    @Test
+    void delete_ignoresNullAuthorId() {
+        this.authorRepository.delete(null);
+
+        assertThat(this.authorRepository.findAll())
+                .extracting(Author::name)
+                .containsExactly("Bert Bates", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
+    }
 
     @SpringBootApplication
     public static class TestConfiguration {
