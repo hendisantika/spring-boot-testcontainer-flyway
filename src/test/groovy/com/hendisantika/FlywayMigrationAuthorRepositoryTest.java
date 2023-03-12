@@ -11,6 +11,7 @@ package com.hendisantika;
  * To change this template use File | Settings | File Templates.
  */
 
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration test that uses {@link CleanDatabaseTestExecutionListener} to reinitialise the database after each test.
@@ -45,6 +48,15 @@ public class FlywayMigrationAuthorRepositoryTest extends AbstractPostgresJupiter
 
     @Autowired
     AuthorRepository authorRepository;
+
+    @Test
+    void findAll_returnsAllAuthors() {
+        var authors = this.authorRepository.findAll();
+
+        assertThat(authors)
+                .extracting(Author::name)
+                .containsExactly("Bert Bates", "Joshua Bloch", "Kathy Sierra", "Trisha Gee");
+    }
 
     @SpringBootApplication
     public static class TestConfiguration {
