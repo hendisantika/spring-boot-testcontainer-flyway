@@ -66,7 +66,10 @@ tasks.withType(Test).configureEach {
 // be used to re-initialize the test database before every test. If you do not need that functionality, remove all
 // remaining lines.
 
+
+import com.bmuschko.gradle.docker.tasks.container.*
 import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
+import org.flywaydb.gradle.task.FlywayMigrateTask
 
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
